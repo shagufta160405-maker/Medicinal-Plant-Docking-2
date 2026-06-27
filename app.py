@@ -1,7 +1,7 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import urllib.request
 import py3Dmol
-from stmol import showmol
 from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem import AllChem
@@ -13,6 +13,10 @@ st.title("🧬 Medicinal Plant Molecular Docking Portal")
 st.markdown("Prepare proteins and medicinal plant ligands for molecular docking.")
 
 # --- Helper Functions ---
+def showmol(view, height=400, width=800):
+    """Bypasses stmol dependency by rendering py3Dmol directly in Streamlit."""
+    components.html(view._make_html(), height=height, width=width)
+
 @st.cache_data
 def fetch_pdb(pdb_id):
     url = f"https://files.rcsb.org/view/{pdb_id.upper()}.pdb"
@@ -141,8 +145,6 @@ with tab4:
         clean_pdb = "\n".join([line for line in st.session_state['pdb_data'].split('\n') if line.startswith("ATOM")])
         st.success("Water and co-factors stripped. Ready for partial charge calculation.")
         st.download_button("Download Cleaned Receptor (PDB)", clean_pdb, file_name="receptor_clean.pdb")
-        
-        st.info("Note: Full PDBQT conversion requires AutoDockTools or OpenBabel. You can process the cleaned PDB downloaded above through your local MGLTools.")
         
     if 'sdf_block' in st.session_state:
         st.subheader("Ligand Processing")
