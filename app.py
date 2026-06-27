@@ -78,61 +78,47 @@ with tab1:
 # --- TAB 2: LIGAND (SMILES) ---
 with tab2:
     st.header("Medicinal Plant Ligand Setup")
-    smiles = st.text_input("Enter Ligand SMILES string:", "CC(=O)OC1=CC=CC=C1C(=O)O") # Default: Aspirin
+    smiles = st.text_input("Enter Ligand SMILES string:", "CC(=O)OC1=CC=CC=C1C(=O)O")
     
+    # 1. Function defined at the top of the tab
+    def calculate_drug_likeness(mol):
+        mw = Descriptors.MolWt(mol)
+        logp = Descriptors.MolLogP(mol)
+        hbd = Descriptors.NumHDonors(mol)
+        hba = Descriptors.NumHAcceptors(mol)
+        return mw, logp, hbd, hba
+
     if st.button("Generate Ligand Structures"):
+        # 2. Try/Except block starts here
         try:
-            # Generate 2D
             mol = Chem.MolFromSmiles(smiles)
             if mol:
-                from rdkit.Chem import Descriptors
-
-def calculate_drug_likeness(mol):
-    mw = Descriptors.MolWt(mol)
-    logp = Descriptors.MolLogP(mol)
-    hbd = Descriptors.NumHDonors(mol)
-    hba = Descriptors.NumHAcceptors(mol)
-    return mw, logp, hbd, hba
-
-# Inside your "Generate Ligand Structures" block:
-if mol:
-    mw, logp, hbd, hba = calculate_drug_likeness(mol)
-    st.write("### Pharmacological Properties (Lipinski's Rule)")
-    st.write(f"- Molecular Weight: {mw:.2f} Da")
-    st.write(f"- LogP: {logp:.2f}")
-    st.write(f"- Hydrogen Bond Donors: {hbd}")
-    st.write(f"- Hydrogen Bond Acceptors: {hba}")
+                # 3. Logic works safely inside here
+                mw, logp, hbd, hba = calculate_drug_likeness(mol)
+                st.subheader("Pharmacological Properties (Lipinski's Rules)")
+                col_a, col_b, col_c, col_d = st.columns(4)
+                col_a.metric("Mol Weight", f"{mw:.1f}")
+                col_b.metric("LogP", f"{logp:.1f}")
+                col_c.metric("H-Bond Donors", hbd)
+                col_d.metric("H-Bond Acceptors", hba)
+                
                 st.session_state['ligand_mol'] = mol
                 img = Draw.MolToImage(mol, size=(400, 400))
-                
-                # Generate 3D SDF
                 mol_3d = Chem.AddHs(mol)
                 AllChem.EmbedMolecule(mol_3d, randomSeed=42)
                 AllChem.MMFFOptimizeMolecule(mol_3d)
-                st.session_state['ligand_3d'] = mol_3d
-                
                 sdf_block = Chem.MolToMolBlock(mol_3d)
                 st.session_state['sdf_block'] = sdf_block
                 
                 col1, col2 = st.columns(2)
                 with col1:
-                    st.markdown("### 2D Structure")
                     st.image(img)
-                
                 with col2:
-                    st.markdown("### 3D Structure")
                     view = py3Dmol.view(width=400, height=400)
                     view.addModel(sdf_block, 'sdf')
                     view.setStyle({'stick': {}})
                     view.zoomTo()
                     showmol(view, height=400, width=400)
-                    
-                st.download_button(
-                    label="Download 3D SDF File",
-                    data=sdf_block,
-                    file_name="ligand_3D.sdf",
-                    mime="chemical/x-mdl-sdfile"
-                )
             else:
                 st.error("Invalid SMILES string.")
         except Exception as e:
