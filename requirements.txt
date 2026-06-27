@@ -1,0 +1,5 @@
+streamlit
+stmol
+py3Dmol
+rdkit
+biopython
