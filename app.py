@@ -3,9 +3,19 @@ import streamlit.components.v1 as components
 import urllib.request
 import py3Dmol
 from rdkit import Chem
-from rdkit.Chem import Draw
+import streamlit as st
+import streamlit.components.v1 as components
+import urllib.request
+import py3Dmol
+from rdkit import Chem
 from rdkit.Chem import AllChem
-import io
+# Use the Draw module cautiously
+try:
+    from rdkit.Chem import Draw
+except ImportError:
+    st.error("RDKit Draw module failed to load. Ensure packages.txt includes libxrender1.")
+
+# ... rest of your code ...
 
 # --- Page Config ---
 st.set_page_config(page_title="Medicinal Plant Docking Portal", layout="wide")
