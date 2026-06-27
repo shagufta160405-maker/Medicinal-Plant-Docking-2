@@ -85,6 +85,23 @@ with tab2:
             # Generate 2D
             mol = Chem.MolFromSmiles(smiles)
             if mol:
+                from rdkit.Chem import Descriptors
+
+def calculate_drug_likeness(mol):
+    mw = Descriptors.MolWt(mol)
+    logp = Descriptors.MolLogP(mol)
+    hbd = Descriptors.NumHDonors(mol)
+    hba = Descriptors.NumHAcceptors(mol)
+    return mw, logp, hbd, hba
+
+# Inside your "Generate Ligand Structures" block:
+if mol:
+    mw, logp, hbd, hba = calculate_drug_likeness(mol)
+    st.write("### Pharmacological Properties (Lipinski's Rule)")
+    st.write(f"- Molecular Weight: {mw:.2f} Da")
+    st.write(f"- LogP: {logp:.2f}")
+    st.write(f"- Hydrogen Bond Donors: {hbd}")
+    st.write(f"- Hydrogen Bond Acceptors: {hba}")
                 st.session_state['ligand_mol'] = mol
                 img = Draw.MolToImage(mol, size=(400, 400))
                 
