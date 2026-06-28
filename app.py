@@ -80,70 +80,60 @@ with tab1:
 with tab2:
     st.header("Medicinal Plant Ligand Setup")
     
-    # 1. UNANI KNOWLEDGE BASE & REFERENCES
-    st.subheader("📖 Traditional Unani References")
+    # Database with Unani References
     unani_plants = {
-        "Custom (Enter manually)": {"smiles": "CC(=O)OC1=CC=CC=C1C(=O)O", "ref": "Enter your own SMILES string below."},
-        "Kalonji / Black Seed (Thymoquinone)": {
+        "Kalonji (Black Seed)": {
             "smiles": "CC1=CC(=O)C(=C(C1=O)C)C(C)C", 
-            "ref": "📚 **Reference:** 'Al-Qanun fi al-Tibb' (Canon of Medicine) by Ibn Sina. \n🌿 **Unani Use:** Used for respiratory disorders, immunomodulation, and neuroprotection."
+            "ref": "Canon of Medicine (Ibn Sina)",
+            "prop": "Muhallil-e-Waram (Anti-inflammatory)",
+            "eng": "Anti-inflammatory"
         },
-        "Haldi / Turmeric (Curcumin)": {
+        "Haldi (Turmeric)": {
             "smiles": "COc1cc(cc(c1O)/C=C/C(=O)CC(=O)/C=C/c2ccc(c(c2)OC)O)O", 
-            "ref": "📚 **Reference:** 'Kitab al-Jami li-Mufradat al-Adwiya' by Ibn al-Baitar. \n🌿 **Unani Use:** Potent anti-inflammatory (Muhallil-e-Waram) and wound healing properties."
+            "ref": "Kitab al-Jami (Ibn al-Baitar)",
+            "prop": "Mudammil-e-Jirah (Wound healer)",
+            "eng": "Wound healer"
         },
-        "Asgandh / Ashwagandha (Withaferin A)": {
+        "Asgandh (Ashwagandha)": {
             "smiles": "CC1=C(C(=O)OC1C2(C3CC4C5(CCC(C(C5(CC(C4(C3(O2)C)C)O)O)C)O)C)C)C", 
-            "ref": "📚 **Reference:** Unani Pharmacopoeia of India (UPI). \n🌿 **Unani Use:** Muqawwi-e-Aam (General Tonic) used for nervous exhaustion and vitality."
+            "ref": "Unani Pharmacopoeia of India",
+            "prop": "Muqawwi-e-Aam (General Tonic)",
+            "eng": "General Tonic"
         }
     }
     
-    selected_plant = st.selectbox("Select a Traditional Unani Plant:", list(unani_plants.keys()))
-    st.info(unani_plants[selected_plant]["ref"])
+    # Searchable Selectbox
+    plant_names = list(unani_plants.keys())
+    selected_plant = st.selectbox("Search and Select Unani Plant:", plant_names)
     
-    # Base SMILES from selection
-    base_smiles = st.text_input("Base Ligand SMILES:", unani_plants[selected_plant]["smiles"])
+    # Display Info
+    plant_data = unani_plants[selected_plant]
+    st.markdown(f"**📚 Reference:** {plant_data['ref']}")
+    st.markdown(f"**🌿 Unani Property:** `{plant_data['prop']}`")
+    st.markdown(f"**🇺🇸 English Translation:** *{plant_data['eng']}*")
     
-    # 2. STRUCTURAL OPTIMIZATION (EFFICIENCY & FEASIBILITY)
-    with st.expander("🔬 Structural Optimization (Enhance Efficiency)"):
-        st.write("Modify the chemical structure to improve drug-likeness (feasibility) and binding affinity (efficiency).")
-        st.markdown("*Tip: Try adding a Hydroxyl (`O`) for hydrogen bonding, or Fluorine (`F`) for metabolic stability.*")
-        optimized_smiles = st.text_input("Optimized SMILES (Edit here):", base_smiles)
+    # Structural Input
+    base_smiles = st.text_input("Base Ligand SMILES:", plant_data["smiles"])
     
-    # Use the optimized SMILES if edited, otherwise use the base
+    with st.expander("🔬 Structural Optimization"):
+        optimized_smiles = st.text_input("Edit SMILES for optimization:", base_smiles)
+    
     final_smiles = optimized_smiles if optimized_smiles else base_smiles
-
-    def calculate_drug_likeness(mol):
-        mw = Descriptors.MolWt(mol)
-        logp = Descriptors.MolLogP(mol)
-        hbd = Descriptors.NumHDonors(mol)
-        hba = Descriptors.NumHAcceptors(mol)
-        return mw, logp, hbd, hba
 
     if st.button("Generate Ligand Structures"):
         try:
             mol = Chem.MolFromSmiles(final_smiles)
             if mol:
+                # Lipinski check
                 mw, logp, hbd, hba = calculate_drug_likeness(mol)
+                st.subheader("Pharmacological Feasibility")
+                c1, c2, c3, c4 = st.columns(4)
+                c1.metric("Weight", f"{mw:.1f}")
+                c2.metric("LogP", f"{logp:.1f}")
+                c3.metric("HBD", hbd)
+                c4.metric("HBA", hba)
                 
-                # Check Feasibility (Lipinski's Rule of 5)
-                st.subheader("Pharmacological Feasibility (Lipinski's Rules)")
-                col_a, col_b, col_c, col_d = st.columns(4)
-                
-                # Highlighting in red if they violate feasibility rules
-                mw_color = "normal" if mw <= 500 else "inverse"
-                logp_color = "normal" if logp <= 5 else "inverse"
-                
-                col_a.metric("Mol Weight (≤500)", f"{mw:.1f}", delta="Ideal" if mw<=500 else "High", delta_color=mw_color)
-                col_b.metric("LogP (≤5)", f"{logp:.1f}", delta="Ideal" if logp<=5 else "High", delta_color=logp_color)
-                col_c.metric("H-Bond Donors (≤5)", hbd)
-                col_d.metric("H-Bond Acceptors (≤10)", hba)
-                
-                if mw > 500 or logp > 5 or hbd > 5 or hba > 10:
-                    st.warning("⚠️ This structure violates Lipinski's Rule of 5. It may have poor oral feasibility. Try modifying the structure above.")
-                else:
-                    st.success("✅ Excellent pharmacological feasibility! Ready for docking.")
-
+                # Visuals
                 st.session_state['ligand_mol'] = mol
                 img = Draw.MolToImage(mol, size=(400, 400))
                 mol_3d = Chem.AddHs(mol)
@@ -153,18 +143,16 @@ with tab2:
                 st.session_state['sdf_block'] = sdf_block
                 
                 col1, col2 = st.columns(2)
-                with col1:
-                    st.image(img, caption="2D Structure")
-                with col2:
-                    view = py3Dmol.view(width=400, height=400)
-                    view.addModel(sdf_block, 'sdf')
-                    view.setStyle({'stick': {}})
-                    view.zoomTo()
-                    showmol(view, height=400, width=400)
+                col1.image(img)
+                view = py3Dmol.view(width=400, height=400)
+                view.addModel(sdf_block, 'sdf')
+                view.setStyle({'stick': {}})
+                view.zoomTo()
+                showmol(view, height=400, width=400)
             else:
-                st.error("Invalid SMILES string.")
+                st.error("Invalid SMILES.")
         except Exception as e:
-            st.error(f"Error processing SMILES: {e}")
+            st.error(f"Error: {e}")
 # --- TAB 3: CAVITY & CO-FACTORS ---
 with tab3:
     st.header("Scan Cavity & Identify Co-factor Heteroatoms")
