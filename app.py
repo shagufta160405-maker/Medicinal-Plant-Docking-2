@@ -1,3 +1,5 @@
+import pandas as pd
+import time
 import streamlit as st
 import streamlit.components.v1 as components
 import urllib.request
@@ -42,8 +44,7 @@ def extract_heteroatoms(pdb_data):
     return "\n".join(hetatms)
 
 # --- UI Tabs ---
-tab1, tab2, tab3, tab4 = st.tabs(["1. Protein Preparation", "2. Ligand (SMILES)", "3. Cavity & Co-factors", "4. PDBQT Export"])
-
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs(["1. Protein", "2. Ligand", "3. Cavity", "4. PDBQT", "5. Params", "6. Scoring", "7. Submit", "8. Results", "9. History"])
 # --- TAB 1: PROTEIN PREPARATION ---
 with tab1:
     st.header("Fetch or Upload Target Protein")
@@ -160,3 +161,87 @@ with tab4:
         st.subheader("Ligand Processing")
         st.success("3D Ligand coordinates mapped. Ready for torsion tree root setup.")
         st.download_button("Download Ligand (SDF)", st.session_state['sdf_block'], file_name="ligand_prepared.sdf")
+
+# --- TAB 5: DOCKING PARAMETERS ---
+with tab5:
+    st.header("Search & Grid Parameters")
+    col1, col2, col3 = st.columns(3)
+    exhaustiveness = col1.number_input("Exhaustiveness", value=8, step=1)
+    num_modes = col2.number_input("Number of Modes", value=10, step=1)
+    energy_range = col3.number_input("Energy Range (kcal/mol)", value=3, step=1)
+
+    st.subheader("Grid Box Dimensions")
+    g_col1, g_col2, g_col3 = st.columns(3)
+    center_x = g_col1.number_input("Center X", value=0.0)
+    center_y = g_col2.number_input("Center Y", value=0.0)
+    center_z = g_col3.number_input("Center Z", value=0.0)
+    size_x = g_col1.number_input("Size X", value=20.0)
+    size_y = g_col2.number_input("Size Y", value=20.0)
+    size_z = g_col3.number_input("Size Z", value=20.0)
+
+    with st.expander("Advanced Options"):
+        flexible_res = st.toggle("Enable Flexible Residues")
+        seed = st.number_input("Random Seed", value=42, step=1)
+
+# --- TAB 6: SCORING & OUTPUT ---
+with tab6:
+    st.header("Scoring & Output Settings")
+    scoring = st.selectbox("Scoring Function", ["Vina", "Vinardo", "AutoDock4 (AD4)"])
+    poses = st.slider("Number of poses to save", min_value=1, max_value=20, value=9)
+    rmsd = st.number_input("RMSD Clustering Threshold (Å)", value=2.0, step=0.1)
+    out_format = st.radio("Output format", ["PDBQT", "SDF"])
+
+# --- TAB 7: JOB SUBMISSION ---
+with tab7:
+    st.header("Submit Docking Job")
+    job_name = st.text_input("Job Name", "Unani_Plant_Docking_01")
+    job_desc = st.text_area("Description (Optional)", "Docking of Curcumin against 1HSG...")
+    
+    col1, col2 = st.columns(2)
+    compute_mode = col1.selectbox("Compute Mode", ["CPU (Standard)", "GPU (Accelerated)"])
+    email_notif = col2.toggle("Email notification on completion")
+
+    if st.button("🚀 Submit Job", type="primary"):
+        with st.spinner("Submitting job to compute cluster..."):
+            time.sleep(2)
+            st.success(f"Job '{job_name}' successfully submitted!")
+
+# --- TAB 8: RESULTS & VISUALIZATION ---
+with tab8:
+    st.header("Results & Visualization")
+    res_data = pd.DataFrame({
+        "Rank": [1, 2, 3, 4, 5],
+        "Binding Affinity (kcal/mol)": [-9.8, -9.4, -9.1, -8.8, -8.5],
+        "RMSD (l.b.)": [0.00, 1.25, 2.10, 2.80, 3.45],
+        "Pose ID": ["Pose_01", "Pose_02", "Pose_03", "Pose_04", "Pose_05"]
+    })
+    
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.subheader("Pose Rankings")
+        st.dataframe(res_data, use_container_width=True, hide_index=True)
+        col_btn1, col_btn2 = st.columns(2)
+        col_btn1.download_button("⬇️ Download PDBQT", "dummy_data", file_name="results.pdbqt")
+        col_btn2.download_button("⬇️ Export CSV", res_data.to_csv(index=False), file_name="rankings.csv")
+
+    with col2:
+        res_tab1, res_tab2 = st.tabs(["Interactions", "Raw Files"])
+        with res_tab1:
+            st.write("**Interaction Summary:**\n- Hydrogen bonds: ASP25, GLY27\n- Hydrophobic: ILE50, PRO81")
+        with res_tab2:
+            st.code("REMARK VINA RESULT: -9.8  0.000  0.000\nATOM      1  C   UNL     1...")
+
+# --- TAB 9: JOB HISTORY / WORKSPACE ---
+with tab9:
+    st.header("Job History / Workspace")
+    col1, col2 = st.columns([3, 1])
+    search_q = col1.text_input("🔍 Search Jobs")
+    status_filter = col2.selectbox("Filter by Status", ["All", "Running", "Completed", "Failed"])
+    
+    history_data = pd.DataFrame({
+        "Job Name": ["Curcumin_1HSG", "Quercetin_6LU7", "Aspirin_Test"],
+        "Date": ["2026-06-28", "2026-06-27", "2026-06-25"],
+        "Status": ["Completed", "Running", "Failed"],
+        "Actions": ["View / Re-run", "View Log", "Delete"]
+    })
+    st.dataframe(history_data, use_container_width=True, hide_index=True)
