@@ -79,43 +79,49 @@ with tab1:
 with tab2:
     st.header("Medicinal Plant Ligand Setup")
     
-    # 1. Database of Unani Knowledge
-    UNANI_DB = {
-        "Kalonji": {"prop": "Muhallil-e-Waram", "ref": "Canon of Medicine (Ibn Sina)", "eng": "Anti-inflammatory", "smiles": "CC1=CC(=O)C(=C(C1=O)C)C(C)C"},
-        "Haldi": {"prop": "Mudammil-e-Jirah", "ref": "Kitab al-Jami (Ibn al-Baitar)", "eng": "Wound healer", "smiles": "COc1cc(cc(c1O)/C=C/C(=O)CC(=O)/C=C/c2ccc(c(c2)OC)O)O"},
-        "Asgandh": {"prop": "Muqawwi-e-Aam", "ref": "Unani Pharmacopoeia of India", "eng": "General Tonic", "smiles": "CC1=C(C(=O)OC1C2(C3CC4C5(CCC(C(C5(CC(C4(C3(O2)C)C)O)O)C)O)C)C)C"}
-    }
+    # 1. Load the database from CSV
+    try:
+        df = pd.read_csv("unani_data.csv")
+    except FileNotFoundError:
+        st.error("Database file 'unani_data.csv' not found. Please ensure it is in the same folder.")
+        df = pd.DataFrame(columns=["Name", "Property", "Reference", "English", "SMILES"])
 
-    # 2. Input Fields
+    # 2. Input and Fetch
     plant_input = st.text_input("Enter Plant Name (e.g. Kalonji):")
     
-    # Auto-fill logic
-    if st.button("🔍 Auto-fill Details"):
-        if plant_input in UNANI_DB:
-            st.session_state['data'] = UNANI_DB[plant_input]
-        else:
-            st.warning("Plant not in database. Please enter details manually below.")
-            st.session_state['data'] = {"prop": "", "ref": "", "eng": "", "smiles": ""}
-
-    # 3. Display fields (populated by session state)
-    data = st.session_state.get('data', {"prop": "", "ref": "", "eng": "", "smiles": ""})
+    # Defaults
+    data = {"Property": "", "Reference": "", "English": "", "SMILES": ""}
     
+    if st.button("🔍 Fetch from Database"):
+        # Search the DataFrame (case-insensitive)
+        match = df[df['Name'].str.lower() == plant_input.lower()]
+        if not match.empty:
+            data = match.iloc[0].to_dict()
+            st.success(f"Plant '{plant_input}' found!")
+        else:
+            st.warning("Plant not found in database. Enter manually below.")
+
+    # 3. Input Fields (Auto-filled by 'data' dictionary)
     col_a, col_b = st.columns(2)
     with col_a:
-        plant_name = st.text_input("Plant Name:", value=plant_input)
-        unani_prop = st.text_input("Unani Property:", value=data['prop'])
+        unani_prop = st.text_input("Unani Property:", value=data['Property'])
+        reference = st.text_input("Reference/Source:", value=data['Reference'])
     with col_b:
-        reference = st.text_input("Reference/Source:", value=data['ref'])
-        eng_prop = st.text_input("English Translation:", value=data['eng'])
-    
-    base_smiles = st.text_input("Base Ligand SMILES:", value=data['smiles'])
+        eng_prop = st.text_input("English Translation:", value=data['English'])
+        base_smiles = st.text_input("Base Ligand SMILES:", value=data['SMILES'])
 
-    # 4. Docking & Optimization logic (Same as before)
+    # 4. Docking & Optimization Logic
+    with st.expander("🔬 Structural Optimization"):
+        optimized_smiles = st.text_input("Edit SMILES for optimization:", base_smiles)
+    
+    final_smiles = optimized_smiles if optimized_smiles else base_smiles
+
     if st.button("Generate Ligand Structures"):
-        # ... [Keep your existing docking/generation logic here] ...
+        # ... (Your existing docking/visual logic here, using 'final_smiles')
         try:
-            mol = Chem.MolFromSmiles(base_smiles)
+            mol = Chem.MolFromSmiles(final_smiles)
             if mol:
+                # Lipinski Check
                 mw, logp, hbd, hba = calculate_drug_likeness(mol)
                 st.subheader("Pharmacological Feasibility")
                 c1, c2, c3, c4 = st.columns(4)
@@ -123,8 +129,18 @@ with tab2:
                 c2.metric("LogP", f"{logp:.1f}")
                 c3.metric("HBD", hbd)
                 c4.metric("HBA", hba)
+                
+                # Visuals
                 st.session_state['ligand_mol'] = mol
-                # ... (rest of your visual code)
+                img = Draw.MolToImage(mol, size=(400, 400))
+                mol_3d = Chem.AddHs(mol)
+                AllChem.EmbedMolecule(mol_3d, randomSeed=42)
+                AllChem.MMFFOptimizeMolecule(mol_3d)
+                sdf_block = Chem.MolToMolBlock(mol_3d)
+                
+                col1, col2 = st.columns(2)
+                col1.image(img)
+                # ... (rest of your visual code with py3Dmol)
             else:
                 st.error("Invalid SMILES.")
         except Exception as e:
