@@ -75,47 +75,31 @@ with tab1:
         view.setStyle({'cartoon': {'color': 'spectrum'}})
         view.zoomTo()
         showmol(view, height=400, width=800)
-
 # --- TAB 2: LIGAND (SMILES) ---
 with tab2:
     st.header("Medicinal Plant Ligand Setup")
     
-    # Database with Unani References
-    unani_plants = {
-        "Kalonji (Black Seed)": {
-            "smiles": "CC1=CC(=O)C(=C(C1=O)C)C(C)C", 
-            "ref": "Canon of Medicine (Ibn Sina)",
-            "prop": "Muhallil-e-Waram (Anti-inflammatory)",
-            "eng": "Anti-inflammatory"
-        },
-        "Haldi (Turmeric)": {
-            "smiles": "COc1cc(cc(c1O)/C=C/C(=O)CC(=O)/C=C/c2ccc(c(c2)OC)O)O", 
-            "ref": "Kitab al-Jami (Ibn al-Baitar)",
-            "prop": "Mudammil-e-Jirah (Wound healer)",
-            "eng": "Wound healer"
-        },
-        "Asgandh (Ashwagandha)": {
-            "smiles": "CC1=C(C(=O)OC1C2(C3CC4C5(CCC(C(C5(CC(C4(C3(O2)C)C)O)O)C)O)C)C)C", 
-            "ref": "Unani Pharmacopoeia of India",
-            "prop": "Muqawwi-e-Aam (General Tonic)",
-            "eng": "General Tonic"
-        }
-    }
+    st.subheader("Enter Plant Details")
+    col_a, col_b = st.columns(2)
+    with col_a:
+        plant_name = st.text_input("Plant Name:", "Kalonji")
+        unani_prop = st.text_input("Unani Property (e.g. Muhallil-e-Waram):", "Muhallil-e-Waram")
+    with col_b:
+        reference = st.text_input("Reference/Source:", "Canon of Medicine (Ibn Sina)")
+        eng_prop = st.text_input("English Translation:", "Anti-inflammatory")
     
-    # Searchable Selectbox
-    plant_names = list(unani_plants.keys())
-    selected_plant = st.selectbox("Search and Select Unani Plant:", plant_names)
+    base_smiles = st.text_input("Base Ligand SMILES:", "CC1=CC(=O)C(=C(C1=O)C)C(C)C")
+
+    # Display Summary
+    st.markdown("---")
+    st.markdown(f"**🌿 Selected Plant:** {plant_name}")
+    st.markdown(f"**📚 Reference:** {reference}")
+    st.markdown(f"**Unani Property:** `{unani_prop}` | **English:** *{eng_prop}*")
+    st.markdown("---")
     
-    # Display Info
-    plant_data = unani_plants[selected_plant]
-    st.markdown(f"**📚 Reference:** {plant_data['ref']}")
-    st.markdown(f"**🌿 Unani Property:** `{plant_data['prop']}`")
-    st.markdown(f"**🇺🇸 English Translation:** *{plant_data['eng']}*")
-    
-    # Structural Input
-    base_smiles = st.text_input("Base Ligand SMILES:", plant_data["smiles"])
-    
+    # Structural Optimization
     with st.expander("🔬 Structural Optimization"):
+        st.write("Modify the SMILES to test chemical variations.")
         optimized_smiles = st.text_input("Edit SMILES for optimization:", base_smiles)
     
     final_smiles = optimized_smiles if optimized_smiles else base_smiles
