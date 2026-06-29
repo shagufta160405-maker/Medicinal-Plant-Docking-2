@@ -1,1 +1,20 @@
-
+Asgand	Withania somnifera	Withaferin A	CC1=C(C(=O)C2C(O1)C(C3C(C4C(C5(C3(C2O)C)CCC6C5(CC(C(=O)C=C6)O)C)CC4)C)C)C	Cyclooxygenase-2 (COX-2)	5IKQ	Anti-inflammatory, Adaptogenic, Nervine tonic	Al-Qanoon fil Tibb (Avicenna)
+Asl-us-Soos	Glycyrrhiza glabra	Glycyrrhizin	CC1(C2CCC3(C(C2(CCC1(C)C(=O)O)C)C(=O)C=C4C3(CCC5(C4CC(CC5)(C)C(=O)O)C)C)C)OC6C(C(C(C(O6)C(=O)O)O)O)OC7C(C(C(C(O7)C(=O)O)O)O)O	Thrombin	1PPB	Demulcent, Anti-tussive, Gastroprotective	Kitab al-Hawi (Rhazes)
+Zanjabeel	Zingiber officinale	6-Gingerol	CCCCCC(CC1=CC(=C(C=C1)O)OC)O	5-Lipoxygenase (5-LOX)	6N2W	Carminative, Anti-emetic, Digestive	Makhzan-al-Advia (Baitar)
+Filfil Siyah	Piper nigrum	Piperine	C1CCN(CC1)C(=O)C=CC=CC2=CC3=C(C=C2)OCO3	CYP3A4 Enzyme	1W0E	Bioenhancer, Carminative, Expectorant	Kitab al-Abniya
+Halela Siyah	Terminalia chebula	Chebulinic acid	C1=C(C=C(C(=C1)O)O)C(=O)OC2C(C(C(C(O2)COC(=O)C3=CC(=C(C(=C3)O)O)O)OC(=O)C4=CC(=C(C(=C4)O)O)O)OC(=O)C5=CC(=C(C(=C5)O)O)O)OC(=O)C6C(C7C(C(O7)O)C(=O)O6)C8=CC(=C(C(=C8)O)O)O	Alpha-glucosidase	3W37	Laxative, Brain tonic, Antioxidant	Bastan al-Mufradat
+Chiraita	Swertia chirayita	Amarogentin	CC1=C(C=C(C(=C1)O)O)C(=O)OC2=CC3=C(C(=C2)OC4C(C(C(C(O4)CO)O)O)O)OC(=O)C=C3C=C	Alpha-amylase	1B2Y	Febrifuge, Hepatoprotective, Bitter tonic	Kitab al-Mansuri (Rhazes)
+Afsanteen	Artemisia absinthium	Absinthin	CC1C2CC3C(C2(C4CC5C(C41)C(C(C5(C)O)CC6=CC(=O)OC63)C)C)C7=CC(=O)OC7	Tumor Necrosis Factor-alpha (TNF-a)	2AZ5	Anthelmintic, Deobstruent, Appetizer	Al-Qanoon fil Tibb (Avicenna)
+Babuna	Matricaria chamomilla	Apigenin	C1=CC(=CC=C1C2=CC(=O)C3=C(C=C(C=C3O2)O)O)O	Human GABA-A Receptor	6D6T	Sedative, Analgesic, Anti-pyretic	Kitab al-Jami (Ibn Baitar)
+Kalonji	Nigella sativa	Thymoquinone	CC1=CC(=O)C(C=C1=O)C(C)C	Nuclear Factor Kappa B (NF-kB)	1RAM	Immunomodulator, Bronchodilator	Tibb-e-Nabawi (Prophetic Med)
+Kurchi	Holarrhena antidysenterica	Conessine	CC(C1CCC2C1(CCC3C2CC=C4C3(CCC(C4)N(C)C)C)C)N(C)C	Acetylcholinesterase (AChE)	4EY7	Anti-diarrheal, Amoebicidal, Astringent	Makhzan-al-Advia
+Khulanjan	Alpinia galanga	Galangin	C1=CC=CC=C1C2=C(C(=O)C3=C(C=C(C=C3O2)O)O)O	Matrix Metalloproteinase-9 (MMP-9)	1L6J	Aphrodisiac, Nervine stimulant	Kitab al-Hawi (Rhazes)
+Arusa	Adhatoda vasica	Vasicine	C1CC2=NC3=CC=CC=C3C4=C2N(C1)CC4O	SARS-CoV-2 Main Protease	6Y84	Bronchodilator, Mucolytic, Expectorant	Al-Mufradat al-Qalbiya
+Gilo	Tinospora cordifolia	Tinosporaside	CC1=CC(=O)OC2C1(C(CC3C2(CC(C4(C3CC5=CN=CO5)C)C(=O)O)O)O)OC6C(C(C(C(O6)CO)O)O)O	Macrophage Colony-Stimulating Factor	3W2S	Anti-pyretic, Immunomodulator	Bastan al-Mufradat
+Reawand Chini	Rheum emodi	Emodin	CC1=CC2=C(C(=C1)O)C(=O)C3=C(C=C(C=C3C2=O)O)O	Human Topoisomerase II	1ZXM	Purgative, Alterative, Stomachic	Kitab al-Abniya
+Sana	Cassia angustifolia	Sennoside A	C1=CC=C2C(=C1)C(=O)C3=C(C=C(C=C3C2(C4C5=C(C=C(C=C5C(=O)C6=CC=CC=C64)O)C(=O)O)O)O)C(=O)O	Human Aquaporin-3	1YMG	Laxative, Purgative (Mushil-e-Safra)	Al-Qanoon fil Tibb (Avicenna)
+Gurmar	Gymnema sylvestre	Gymnemagenin	CC12CCC3(C(C1CCC2(C)CO)C(CC4C3(CCC5C4(CC(C(C5(C)C)O)O)O)C)O)O	Sweet Taste Receptor (TAS1R3)	5X2M	Anti-diabetic (Anti-shirin)	Makhzan-al-Advia
+Karanjwa	Caesalpinia bonduc	Bonducellin	COC1=CC2=C(C=C1)C(=O)C(C2=CC3=CC=C(C=C3)OC)O	Cyclooxygenase-1 (COX-1)	4I19	Anti-periodic, Antipyretic, Anti-malarial	Kitab al-Jami (Ibn Baitar)
+Sadab	Ruta graveolens	Rutin	CC1C(C(C(C(O1)OCC2C(C(C(C(O2)OC3=C(OC4=CC(=CC(=C4C3=O)O)O)C5=CC(=C(C=C5)O)O)O)O)O)O)O)O	Angiotensin-Converting Enzyme (ACE)	1O8A	Emmenagogue, Antispasmodic	Al-Qanoon fil Tibb (Avicenna)
+Ustukhuddus	Lavandula stoechas	Linalyl acetate	CC(=CCCC(C)(C=C)OC(=O)C)C	Human Muscarinic M3 Receptor	4DA4	Cephalic cleanser, Nervine tonic	Kitab al-Hawi (Rhazes)
+Turbud	Operculina turpethum	Turpethin	CCCCCCCCCCCCCCC(=O)OC1C(C(OC(C1O)CO)OC2C(C(C(C(O2)CO)O)O)O)O	Human Guanylate Cyclase-C	5I6A	Drastic Purgative (Mushil-e-Balgham)	Makhzan-al-Advia
