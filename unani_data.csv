@@ -1,3 +1,4 @@
+Unani Name,Medicinal Activity,Unani Text Reference,Canonical SMILES
 Asgand	Withania somnifera	Withaferin A	CC1=C(C(=O)C2C(O1)C(C3C(C4C(C5(C3(C2O)C)CCC6C5(CC(C(=O)C=C6)O)C)CC4)C)C)C	Cyclooxygenase-2 (COX-2)	5IKQ	Anti-inflammatory, Adaptogenic, Nervine tonic	Al-Qanoon fil Tibb (Avicenna)
 Asl-us-Soos	Glycyrrhiza glabra	Glycyrrhizin	CC1(C2CCC3(C(C2(CCC1(C)C(=O)O)C)C(=O)C=C4C3(CCC5(C4CC(CC5)(C)C(=O)O)C)C)C)OC6C(C(C(C(O6)C(=O)O)O)O)OC7C(C(C(C(O7)C(=O)O)O)O)O	Thrombin	1PPB	Demulcent, Anti-tussive, Gastroprotective	Kitab al-Hawi (Rhazes)
 Zanjabeel	Zingiber officinale	6-Gingerol	CCCCCC(CC1=CC(=C(C=C1)O)OC)O	5-Lipoxygenase (5-LOX)	6N2W	Carminative, Anti-emetic, Digestive	Makhzan-al-Advia (Baitar)
