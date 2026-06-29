@@ -77,74 +77,35 @@ with tab1:
         showmol(view, height=400, width=800)
 # --- TAB 2: LIGAND (SMILES) ---
 with tab2:
-    st.header("Medicinal Plant Ligand Setup")
+    st.header("Medicinal Plant Database Lookup")
     
-    # 1. Load the database from CSV
     try:
-        df = pd.read_csv("unani_data.csv")
-    except FileNotFoundError:
-        st.error("Database file 'unani_data.csv' not found. Please ensure it is in the same folder.")
-        df = pd.DataFrame(columns=["Name", "Property", "Reference", "English", "SMILES"])
+        # header=3 tells pandas to use the 4th row (index 3) as the column names
+        df = pd.read_excel("Unani_Phytochemical_Targets_Database.xlsx", header=3)
+        st.success("✅ Database loaded successfully!")
+    except Exception as e:
+        st.error(f"Error loading file: {e}")
+        df = pd.DataFrame()
 
-    # 2. Input and Fetch
-    plant_input = st.text_input("Enter Plant Name (e.g. Kalonji):")
+    plant_input = st.text_input("Enter Unani Name:")
     
-    # Defaults
-    data = {"Property": "", "Reference": "", "English": "", "SMILES": ""}
-    
-    if st.button("🔍 Fetch from Database"):
-        # Search the DataFrame (case-insensitive)
-        match = df[df['Name'].str.lower() == plant_input.lower()]
-        if not match.empty:
-            data = match.iloc[0].to_dict()
-            st.success(f"Plant '{plant_input}' found!")
-        else:
-            st.warning("Plant not found in database. Enter manually below.")
-
-    # 3. Input Fields (Auto-filled by 'data' dictionary)
-    col_a, col_b = st.columns(2)
-    with col_a:
-        unani_prop = st.text_input("Unani Property:", value=data['Property'])
-        reference = st.text_input("Reference/Source:", value=data['Reference'])
-    with col_b:
-        eng_prop = st.text_input("English Translation:", value=data['English'])
-        base_smiles = st.text_input("Base Ligand SMILES:", value=data['SMILES'])
-
-    # 4. Docking & Optimization Logic
-    with st.expander("🔬 Structural Optimization"):
-        optimized_smiles = st.text_input("Edit SMILES for optimization:", base_smiles)
-    
-    final_smiles = optimized_smiles if optimized_smiles else base_smiles
-
-    if st.button("Generate Ligand Structures"):
-        # ... (Your existing docking/visual logic here, using 'final_smiles')
-        try:
-            mol = Chem.MolFromSmiles(final_smiles)
-            if mol:
-                # Lipinski Check
-                mw, logp, hbd, hba = calculate_drug_likeness(mol)
-                st.subheader("Pharmacological Feasibility")
-                c1, c2, c3, c4 = st.columns(4)
-                c1.metric("Weight", f"{mw:.1f}")
-                c2.metric("LogP", f"{logp:.1f}")
-                c3.metric("HBD", hbd)
-                c4.metric("HBA", hba)
-                
-                # Visuals
-                st.session_state['ligand_mol'] = mol
-                img = Draw.MolToImage(mol, size=(400, 400))
-                mol_3d = Chem.AddHs(mol)
-                AllChem.EmbedMolecule(mol_3d, randomSeed=42)
-                AllChem.MMFFOptimizeMolecule(mol_3d)
-                sdf_block = Chem.MolToMolBlock(mol_3d)
-                
-                col1, col2 = st.columns(2)
-                col1.image(img)
-                # ... (rest of your visual code with py3Dmol)
+    if st.button("🔍 Fetch Details"):
+        if not df.empty:
+            # We use 'Unani Name' because that is the exact header in your file
+            match = df[df['Unani Name'].str.lower() == plant_input.lower()]
+            
+            if not match.empty:
+                st.session_state['data'] = match.iloc[0].to_dict()
+                st.success("Data found!")
             else:
-                st.error("Invalid SMILES.")
-        except Exception as e:
-            st.error(f"Error: {e}")
+                st.warning("Plant not found. Check the spelling.")
+
+    # Access data using the EXACT headers from your file
+    data = st.session_state.get('data', {})
+    
+    unani_prop = st.text_input("Medicinal Activity:", value=data.get('Medicinal Activity', ''))
+    reference = st.text_input("Unani Text Reference:", value=data.get('Unani Text Reference', ''))
+    base_smiles = st.text_input("Canonical SMILES:", value=data.get('Canonical SMILES', ''))
 # --- TAB 3: CAVITY & CO-FACTORS ---
 with tab3:
     st.header("Scan Cavity & Identify Co-factor Heteroatoms")
