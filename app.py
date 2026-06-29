@@ -79,30 +79,32 @@ with tab1:
 with tab2:
     st.header("Medicinal Plant Database Lookup")
     
+    # Load the CSV file
     try:
-        # header=3 tells pandas to use the 4th row (index 3) as the column names
-        df = pd.read_excel("Unani_Phytochemical_Targets_Database.xlsx", header=3)
+        df = pd.read_csv("unani_data.csv")
         st.success("✅ Database loaded successfully!")
-    except Exception as e:
-        st.error(f"Error loading file: {e}")
+    except FileNotFoundError:
+        st.error("❌ 'unani_data.csv' not found. Please ensure it is in the same folder as app.py.")
         df = pd.DataFrame()
 
     plant_input = st.text_input("Enter Unani Name:")
     
     if st.button("🔍 Fetch Details"):
         if not df.empty:
-            # We use 'Unani Name' because that is the exact header in your file
+            # Case-insensitive search on the 'Unani Name' column
+            # Ensure 'Unani Name' is the exact header in your CSV
             match = df[df['Unani Name'].str.lower() == plant_input.lower()]
             
             if not match.empty:
                 st.session_state['data'] = match.iloc[0].to_dict()
                 st.success("Data found!")
             else:
-                st.warning("Plant not found. Check the spelling.")
+                st.warning("Plant not found in the database.")
 
-    # Access data using the EXACT headers from your file
+    # Access data from the session state (populated when "Fetch" is clicked)
     data = st.session_state.get('data', {})
     
+    # These fields auto-fill based on the CSV data
     unani_prop = st.text_input("Medicinal Activity:", value=data.get('Medicinal Activity', ''))
     reference = st.text_input("Unani Text Reference:", value=data.get('Unani Text Reference', ''))
     base_smiles = st.text_input("Canonical SMILES:", value=data.get('Canonical SMILES', ''))
