@@ -77,37 +77,49 @@ with tab1:
         showmol(view, height=400, width=800)
 # --- TAB 2: LIGAND (SMILES) ---
 with tab2:
-    st.header("Medicinal Plant Database Lookup")
+    st.header("Medicinal Plant Ligand Setup")
+    smiles = st.text_input("Enter Ligand SMILES string:", "CC(=O)OC1=CC=CC=C1C(=O)O") # Default: Aspirin
     
-    # Load the CSV file
-    try:
-        df = pd.read_csv("unani_data.csv")
-        st.success("✅ Database loaded successfully!")
-    except FileNotFoundError:
-        st.error("❌ 'unani_data.csv' not found. Please ensure it is in the same folder as app.py.")
-        df = pd.DataFrame()
-
-    plant_input = st.text_input("Enter Unani Name:")
-    
-    if st.button("🔍 Fetch Details"):
-        if not df.empty:
-            # Case-insensitive search on the 'Unani Name' column
-            # Ensure 'Unani Name' is the exact header in your CSV
-            match = df[df['Unani Name'].str.lower() == plant_input.lower()]
-            
-            if not match.empty:
-                st.session_state['data'] = match.iloc[0].to_dict()
-                st.success("Data found!")
+    if st.button("Generate Ligand Structures"):
+        try:
+            # Generate 2D
+            mol = Chem.MolFromSmiles(smiles)
+            if mol:
+                st.session_state['ligand_mol'] = mol
+                img = Draw.MolToImage(mol, size=(400, 400))
+                
+                # Generate 3D SDF
+                mol_3d = Chem.AddHs(mol)
+                AllChem.EmbedMolecule(mol_3d, randomSeed=42)
+                AllChem.MMFFOptimizeMolecule(mol_3d)
+                st.session_state['ligand_3d'] = mol_3d
+                
+                sdf_block = Chem.MolToMolBlock(mol_3d)
+                st.session_state['sdf_block'] = sdf_block
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown("### 2D Structure")
+                    st.image(img)
+                
+                with col2:
+                    st.markdown("### 3D Structure")
+                    view = py3Dmol.view(width=400, height=400)
+                    view.addModel(sdf_block, 'sdf')
+                    view.setStyle({'stick': {}})
+                    view.zoomTo()
+                    showmol(view, height=400, width=400)
+                    
+                st.download_button(
+                    label="Download 3D SDF File",
+                    data=sdf_block,
+                    file_name="ligand_3D.sdf",
+                    mime="chemical/x-mdl-sdfile"
+                )
             else:
-                st.warning("Plant not found in the database.")
-
-    # Access data from the session state (populated when "Fetch" is clicked)
-    data = st.session_state.get('data', {})
-    
-    # These fields auto-fill based on the CSV data
-    unani_prop = st.text_input("Medicinal Activity:", value=data.get('Medicinal Activity', ''))
-    reference = st.text_input("Unani Text Reference:", value=data.get('Unani Text Reference', ''))
-    base_smiles = st.text_input("Canonical SMILES:", value=data.get('Canonical SMILES', ''))
+                st.error("Invalid SMILES string.")
+        except Exception as e:
+            st.error(f"Error processing SMILES: {e}")
 # --- TAB 3: CAVITY & CO-FACTORS ---
 with tab3:
     st.header("Scan Cavity & Identify Co-factor Heteroatoms")
